@@ -1,6 +1,8 @@
 ### **Shifa API - Comprehensive Medical Services Platform**  
-
 Shifa is a full-fledged medical services API designed to streamline patient-doctor interactions, appointment scheduling, medical record management, and payment processing—all under the supervision of an admin panel.  
+
+Built using **Monolithic Architecture**, the application integrates all features and services into a single, unified project, allowing for simpler management during the early stages of development.  
+ 
 
 #### **Key Features:**  
 ✅ **User Authentication & Roles:** Patients, doctors, and admins register with email and password, selecting their respective roles.  
