@@ -10,7 +10,9 @@ namespace ShifaaAPI.Mapping.DoctorMapping
             CreateMap<Doctor, DoctorDetailsDto>()
                 .ForMember(x => x.Name, src => src.MapFrom(x => x.User.Name))
                 .ForMember(x => x.Specialization, src => src.MapFrom(x => x.Specialization.Name));
-            CreateMap<AvailableAppointments, AvailableAppointmentDto>();
+            CreateMap<AvailableAppointments, AvailableAppointmentDto>()
+                .ForMember(x => x.AppointmentId, src => src.MapFrom(x => x.Id));
+
         }
     }
 }

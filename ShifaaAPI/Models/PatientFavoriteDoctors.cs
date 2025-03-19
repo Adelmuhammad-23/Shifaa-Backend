@@ -5,7 +5,7 @@ namespace ShifaaAPI.Models
 {
     public class PatientFavoriteDoctors
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  
         [ForeignKey("Patient")]
         public int PatientId { get; set; }
         public Patient patient { get; set; }

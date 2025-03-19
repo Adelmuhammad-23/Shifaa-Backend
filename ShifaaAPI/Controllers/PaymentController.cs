@@ -1,11 +1,13 @@
 ﻿using ShifaaAPI.DbContext;
 using ShifaaAPI.Enums;
 using ShifaaAPI.Helper;
+using ShifaaAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ShifaaAPI.Controllers
 {
@@ -33,17 +35,22 @@ namespace ShifaaAPI.Controllers
         }
 
         [HttpPost("Pay")]
-        public async Task<IActionResult> Pay([FromForm] int doctorId)
+        public async Task<IActionResult> Pay([FromForm] int doctorId, [FromForm] int bookingId)
         {
-            var doctor = await _context.DoctorSchedules
-                .Where(d => d.DoctorId == doctorId)
-                .Select(d => new { d.Price })
+            var bookingExist = await _context.Bookings.FindAsync(bookingId);
+            if (bookingExist == null)
+                return NotFound("This Booking is not found");
+            var doctor = await _context.Doctors
+                .Where(d => d.Id == doctorId)
                 .FirstOrDefaultAsync();
-
             if (doctor == null)
                 return NotFound("Doctor not found");
+            var doctorPrice = await _context.DoctorSchedules
+                .Where(d => d.DoctorId == doctorId)
+                .Select(p => p.Price)
+                .FirstOrDefaultAsync();
 
-            float price = doctor.Price;
+            float price = doctorPrice;
 
             StripeConfiguration.ApiKey = _stripeModel.Secretkey;
 
@@ -60,24 +67,42 @@ namespace ShifaaAPI.Controllers
                             UnitAmountDecimal = (decimal)price ,
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
-                                Name = $"Consultation with Doctor {doctorId}"
+                                Name = $"Consultation",
+
                             }
                         },
                         Quantity = 1,
                     },
                 },
                 Mode = "payment",
-                SuccessUrl = "http://localhost:5282/success",
+                SuccessUrl = $"http://localhost:5282/success?bookingId={bookingId}",
                 CancelUrl = "http://localhost:5282/",
 
             };
 
             var service = new SessionService();
             Session session = await service.CreateAsync(options);
-            return Ok(new { PaymentUrl = session.Url });
+
+
+            Payment newPayment = new()
+            {
+                BookingId = bookingId,
+                Amount = price,
+                Status = PaymentStatus.Paid,
+            };
+
+            await _context.Payments.AddAsync(newPayment);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { PaymentUrl = session.Url, BookingId = bookingId });
         }
 
         [HttpGet("payment-success")]
+        [SwaggerOperation(
+        Description = "This endpoint is used to confirm that a payment has been successfully completed. It updates the booking status to 'Completed'."
+)]
+        [SwaggerResponse(200, "Payment successful and booking confirmed!", typeof(string))]
+        [SwaggerResponse(404, "Booking not found", typeof(string))]
         public async Task<IActionResult> PaymentSuccess([FromQuery] int bookingId)
         {
             var booking = await _context.Bookings.FindAsync(bookingId);

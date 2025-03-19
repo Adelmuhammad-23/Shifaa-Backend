@@ -2,7 +2,8 @@
 {
     public class AvailableSlotDTO
     {
-        public DateTime Time { get; set; }
+        public DateOnly Day { get; set; }
+        public TimeOnly Time { get; set; }
         public int AppointmentId { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using ShifaaAPI.DbContext;
 using ShifaaAPI.DTO;
 using ShifaaAPI.Models.Identity;
 using ShifaaAPI.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,14 +23,14 @@ namespace ShifaaAPI.ServicesImplementation
             return new UserProfileDTO
             {
                 Name = user.Name,
-                Email = user.Email,
-                Phone = user.PhoneNumber
+               PhotoData = user.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(user.Photo)}": null
+
             };
         }
-      public async Task<UserProfileDTO> UpdateProfileAsync(UserProfileDTO updatedProfile ,int id)
+        public async Task<bool> UpdateProfileAsync(UpdateUserProfileDTO updatedProfile, int id)
         {
             var user = await _dbContext.Users.FindAsync(id);
-            if (user == null) return null;
+            if (user == null) return false;
             if (updatedProfile.Photo != null)
             {
                 using var dataStream = new MemoryStream();
@@ -40,8 +41,11 @@ namespace ShifaaAPI.ServicesImplementation
             user.Email = updatedProfile.Email;
             user.PhoneNumber = updatedProfile.Phone;
             await _dbContext.SaveChangesAsync();
-            return updatedProfile;
+            return true;
+
         }
+
+        
         public async Task<bool> ChangePasswordAsync(int id, ChangePasswordDTO passDTO)
         {
             var user = await _dbContext.Users.FindAsync(id);

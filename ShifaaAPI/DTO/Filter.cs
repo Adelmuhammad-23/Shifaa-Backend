@@ -9,4 +9,5 @@ namespace ShifaaAPI.DTO
         public int? PatientId { get; set; }
         public string? OrderType { get; set; } = "ASC";
     }
+     
 }

@@ -12,6 +12,5 @@ namespace ShifaaAPI.Models
         public DateTime TimeEnd { get; set; }
         public float Price { get; set; }
         public int DoctorId { get; set; }
-        public virtual Doctor Doctor { get; set; }
     }
 }
