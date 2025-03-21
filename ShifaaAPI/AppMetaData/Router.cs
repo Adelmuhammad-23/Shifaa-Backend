@@ -63,6 +63,7 @@
             public const string AddReview = Prefix + "AddReview";
             public const string GetAllReviewsById = Prefix + "GetAllReviewsByDrId";
             public const string GetAllReviews = Prefix + "GetAllReviews";
+            public const string DeleteReview = Prefix + "DeleteReview";
         }
         public static class SpecializationRouting
         {

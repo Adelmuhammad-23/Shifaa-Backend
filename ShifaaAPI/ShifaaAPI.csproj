@@ -31,4 +31,8 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="NewFolder\" />
+	</ItemGroup>
+
 </Project>

@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShifaaAPI;
 using ShifaaAPI.DbContext;
 using ShifaaAPI.Helper;
 using ShifaaAPI.Hubs;
+using ShifaaAPI.Models.Identity;
+using ShifaaAPI.Seeders;
 using Stripe;
 using System.Text;
 
@@ -90,7 +93,15 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShifaaAPI v1");
     });
 }
-
+#region Seeder
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    await RoleSeeder.SeedAsync(roleManager);
+    await UserSeeder.SeedAsync(userManager);
+}
+#endregion
 
 app.UseHttpsRedirection();
 

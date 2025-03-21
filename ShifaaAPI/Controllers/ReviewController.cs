@@ -35,5 +35,12 @@ namespace ShifaaAPI.Controllers
             if (reviews == null) return BadRequest(string.Empty);
             return Ok(reviews);
         }
+        [HttpDelete(Router.ReviewRouting.DeleteReview)]
+        public async Task<IActionResult> DeleteReview(int reviewId)
+        {
+            var review = await _reviewService.DeleteReviewAsync(reviewId);
+            if (review == false) return NotFound("Invalid review id");
+            return Ok("Review has been deleted successfully");
+        }
     }
 }

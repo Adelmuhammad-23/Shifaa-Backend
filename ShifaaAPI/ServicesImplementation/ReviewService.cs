@@ -55,5 +55,16 @@ namespace ShifaaAPI.ServicesImplementation
 
             }).ToListAsync();
         }
+        public async Task<bool> DeleteReviewAsync(int reviewId)
+        {
+            var review = await _dbContext.Reviews.FindAsync(reviewId);
+            if (review == null)
+            {
+                return false;
+            }
+            _dbContext.Reviews.Remove(review);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }
